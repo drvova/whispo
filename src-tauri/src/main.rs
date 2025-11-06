@@ -7,12 +7,14 @@ use tauri::{
     SystemTrayMenuItem,
 };
 use tauri_plugin_clipboard_manager::ClipboardExt;
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
 mod keyboard;
 mod config;
 mod platform;
 mod types;
 mod state;
+mod shortcuts;
 
 use config::ConfigStore;
 use state::AppState;
@@ -828,6 +830,18 @@ async fn preview_context_formatting(
     }))
 }
 
+// ===== GLOBAL SHORTCUTS =====
+
+#[tauri::command]
+async fn register_shortcut(app: AppHandle, shortcut: String) -> Result<(), String> {
+    shortcuts::update_recording_shortcut(&app, &shortcut)
+}
+
+#[tauri::command]
+async fn unregister_shortcuts(app: AppHandle) -> Result<(), String> {
+    shortcuts::unregister_all_shortcuts(&app)
+}
+
 // ===== SYSTEM TRAY =====
 
 fn create_system_tray() -> SystemTray {
@@ -912,6 +926,11 @@ fn main() {
                 }
             });
 
+            // Register global shortcuts
+            if let Err(e) = shortcuts::register_global_shortcuts(app.handle()) {
+                eprintln!("Failed to register shortcuts: {}", e);
+            }
+
             if platform::is_accessibility_granted() {
                 if let Some(window) = app.get_window("main") {
                     let _ = window.show();
@@ -987,6 +1006,8 @@ fn main() {
             detect_context_for_app,
             get_effective_formatting_config,
             preview_context_formatting,
+            register_shortcut,
+            unregister_shortcuts,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

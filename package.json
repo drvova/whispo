@@ -25,16 +25,11 @@
     "postinstall": "echo Installation complete"
   },
   "dependencies": {
-    "@egoist/electron-panel-window": "^8.0.3",
-    "electron-store": "^10.1.0",
+    "@tauri-apps/api": "^2",
     "prism-react-renderer": "^2.4.1"
   },
   "devDependencies": {
     "@egoist/tailwindcss-icons": "^1.8.1",
-    "@egoist/tipc": "^0.3.2",
-    "@electron-toolkit/preload": "^3.0.1",
-    "@electron-toolkit/tsconfig": "^1.0.1",
-    "@electron-toolkit/utils": "^3.0.0",
     "@google/generative-ai": "^0.21.0",
     "@iconify-json/mingcute": "^1.2.1",
     "@radix-ui/react-dialog": "^1.1.2",
@@ -53,10 +48,6 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
-    "electron": "^31.7.7",
-    "electron-builder": "^24.13.3",
-    "electron-updater": "^6.1.7",
-    "electron-vite": "^2.3.0",
     "lucide-react": "^0.452.0",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
