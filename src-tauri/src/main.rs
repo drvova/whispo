@@ -15,10 +15,12 @@ mod platform;
 mod types;
 mod state;
 mod shortcuts;
+mod mcp;
 
 use config::ConfigStore;
 use state::AppState;
 use types::*;
+use mcp::McpClient;
 use std::sync::mpsc::channel;
 
 // ===== CORE TAURI COMMANDS =====
@@ -842,6 +844,68 @@ async fn unregister_shortcuts(app: AppHandle) -> Result<(), String> {
     shortcuts::unregister_all_shortcuts(&app)
 }
 
+// ===== MCP INTEGRATION =====
+
+#[tauri::command]
+async fn mcp_initialize(
+    mcp_client: State<'_, Arc<McpClient>>,
+) -> Result<(), String> {
+    mcp_client.initialize().await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn mcp_is_enabled(
+    mcp_client: State<'_, Arc<McpClient>>,
+) -> Result<bool, String> {
+    Ok(mcp_client.is_enabled())
+}
+
+#[tauri::command]
+async fn mcp_get_config(
+    mcp_client: State<'_, Arc<McpClient>>,
+) -> Result<mcp::McpConfiguration, String> {
+    Ok(mcp_client.get_config())
+}
+
+#[tauri::command]
+async fn mcp_update_config(
+    mcp_client: State<'_, Arc<McpClient>>,
+    config: mcp::McpConfiguration,
+) -> Result<(), String> {
+    mcp_client.update_config(config).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn mcp_list_tools(
+    mcp_client: State<'_, Arc<McpClient>>,
+) -> Result<Vec<mcp::McpTool>, String> {
+    mcp_client.list_tools().await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn mcp_call_tool(
+    mcp_client: State<'_, Arc<McpClient>>,
+    tool_name: String,
+    arguments: std::collections::HashMap<String, serde_json::Value>,
+) -> Result<mcp::ToolResult, String> {
+    mcp_client.call_tool(&tool_name, arguments).await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn mcp_get_context(
+    mcp_client: State<'_, Arc<McpClient>>,
+) -> Result<mcp::TranscriptionContext, String> {
+    mcp_client.get_transcription_context().await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn mcp_enhance_transcript(
+    mcp_client: State<'_, Arc<McpClient>>,
+    transcript: String,
+) -> Result<String, String> {
+    mcp_client.enhance_transcript(&transcript).await.map_err(|e| e.to_string())
+}
+
 // ===== SYSTEM TRAY =====
 
 fn create_system_tray() -> SystemTray {
@@ -902,8 +966,13 @@ fn main() {
             );
             let app_state = Arc::new(AppState::new());
 
+            // Initialize MCP client
+            let mcp_config = mcp::McpConfiguration::default();
+            let mcp_client = Arc::new(McpClient::new(mcp_config));
+
             app.manage(config_store);
             app.manage(app_state);
+            app.manage(mcp_client);
 
             let app_handle = app.handle();
             let (tx, rx) = channel();
@@ -1008,6 +1077,14 @@ fn main() {
             preview_context_formatting,
             register_shortcut,
             unregister_shortcuts,
+            mcp_initialize,
+            mcp_is_enabled,
+            mcp_get_config,
+            mcp_update_config,
+            mcp_list_tools,
+            mcp_call_tool,
+            mcp_get_context,
+            mcp_enhance_transcript,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
