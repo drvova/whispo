@@ -17,6 +17,7 @@ mod state;
 use config::ConfigStore;
 use state::AppState;
 use types::*;
+use std::sync::mpsc::channel;
 
 // ===== CORE TAURI COMMANDS =====
 
@@ -870,11 +871,7 @@ fn handle_tray_event(app: &AppHandle, event: SystemTrayEvent) {
 // ===== MAIN =====
 
 fn main() {
-    std::thread::spawn(|| {
-        if let Err(e) = keyboard::start_keyboard_listener() {
-            eprintln!("Failed to start keyboard listener: {:?}", e);
-        }
-    });
+    keyboard::init_keyboard_system();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -893,6 +890,27 @@ fn main() {
 
             app.manage(config_store);
             app.manage(app_state);
+
+            let app_handle = app.handle();
+            let (tx, rx) = channel();
+            keyboard::set_event_sender(tx);
+
+            std::thread::spawn(move || {
+                while let Ok(event) = rx.recv() {
+                    if let Some(window) = app_handle.get_window("main") {
+                        let _ = window.emit("keyboard-event", &event);
+                    }
+                    if let Some(window) = app_handle.get_window("panel") {
+                        let _ = window.emit("keyboard-event", &event);
+                    }
+                }
+            });
+
+            std::thread::spawn(|| {
+                if let Err(e) = keyboard::start_keyboard_listener() {
+                    eprintln!("Failed to start keyboard listener: {:?}", e);
+                }
+            });
 
             if platform::is_accessibility_granted() {
                 if let Some(window) = app.get_window("main") {
