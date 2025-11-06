@@ -81,23 +81,24 @@ function createTauriClient(): Router {
       return async (input?: any) => {
         try {
           // Convert camelCase to snake_case for Tauri commands
-          const commandName = prop.replace(/([A-Z])/g, '_$1').toLowerCase();
+          const commandName = toSnakeCase(prop);
 
-          // For commands with input, pass it directly
-          // Tauri expects the parameters to match the command signature
+          // For commands with input, unwrap and pass parameters directly
           if (input !== undefined) {
-            // Handle special cases where input is wrapped
-            if (input.config) {
-              return await invoke(commandName, { config: input.config });
-            } else if (input.recording !== undefined) {
-              // Convert ArrayBuffer to Vec<u8> for Tauri
-              const recordingArray = new Uint8Array(input.recording);
+            // Handle special cases
+            if (prop === 'createRecording' && input.recording) {
+              // Convert ArrayBuffer to array for Tauri
+              const recordingArray = Array.from(new Uint8Array(input.recording));
               return await invoke(commandName, {
-                recording: Array.from(recordingArray),
+                recording: recordingArray,
                 duration: input.duration,
                 useFusion: input.useFusion,
               });
+            } else if (prop === 'saveConfig' && input.config) {
+              // Unwrap config parameter
+              return await invoke(commandName, { config: input.config });
             } else {
+              // Pass input directly for other commands
               return await invoke(commandName, input);
             }
           } else {
@@ -112,6 +113,10 @@ function createTauriClient(): Router {
   };
 
   return new Proxy({} as Router, handler);
+}
+
+function toSnakeCase(str: string): string {
+  return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).replace(/^_/, '');
 }
 
 export const tipcClient = createTauriClient();
