@@ -69,9 +69,11 @@ For detailed setup instructions, see the [Quick Start Guide](./docs/guides/QUICK
 
 ### User Guides
 - [Quick Start Guide](./docs/guides/QUICK_START.md) - Get started with Whispo
+- [Development Guide](./docs/guides/DEVELOPMENT.md) - Complete development guide
 - [MCP Integration](./docs/features/MCP_INTEGRATION.md) - Model Context Protocol support
 
-### Migration & Development
+### Development & Contributing
+- [Contributing Guidelines](./CONTRIBUTING.md) - How to contribute to Whispo
 - [Tauri Migration](./docs/migration/TAURI_MIGRATION.md) - Electron to Tauri conversion details
 - [Implementation Complete](./docs/migration/IMPLEMENTATION_COMPLETE.md) - Full feature list
 - [Missing Features Fixed](./docs/migration/MISSING_FEATURES_FIXED.md) - Critical fixes applied
@@ -95,21 +97,28 @@ cd whispo
 
 # Install dependencies
 pnpm install
+```
 
-# Start development server
+### Development
+
+```bash
+# Run UI only (frontend development)
 pnpm run dev
+
+# Run full app with Tauri + UI (recommended)
+pnpm run dev:tauri
 ```
 
 ### Build
 
 ```bash
 # Build for your current platform
-pnpm run tauri:build
+pnpm run build:tauri
 
 # Platform-specific builds
-pnpm run tauri:build:mac    # macOS
-pnpm run tauri:build:win    # Windows
-pnpm run tauri:build:linux  # Linux
+pnpm run build:mac    # macOS
+pnpm run build:win    # Windows
+pnpm run build:linux  # Linux
 ```
 
 ### Project Structure

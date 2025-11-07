@@ -12,6 +12,9 @@ Start here if you're new to Whispo.
 - **[Quick Start Guide](./guides/QUICK_START.md)**
   Get up and running in 5 minutes
 
+- **[Development Guide](./guides/DEVELOPMENT.md)**
+  Complete guide for local development
+
 ### ✨ [Features](./features/)
 Learn about Whispo's powerful features.
 
@@ -44,10 +47,10 @@ Technical documentation for the Electron to Tauri migration.
 - [Troubleshooting](./guides/QUICK_START.md#troubleshooting)
 
 ### For Developers
-- [Project Structure](../README.md#project-structure)
-- [Development Setup](../README.md#development)
-- [Build Instructions](../README.md#build)
-- [Architecture](./migration/TAURI_MIGRATION.md#architecture)
+- [Development Guide](./guides/DEVELOPMENT.md) - Complete development workflow
+- [Contributing Guidelines](../CONTRIBUTING.md) - How to contribute
+- [Project Structure](../README.md#project-structure) - Code organization
+- [Architecture](./migration/TAURI_MIGRATION.md#architecture) - Technical architecture
 
 ### For Contributors
 - [Contributing Guidelines](../README.md#contributing)
