@@ -1,0 +1,46 @@
+# Tauri build ignore file
+
+# Electron-related files
+electron-builder.config.cjs
+electron.vite.config.ts
+dev-app-update.yml
+
+# Source code (not needed in production)
+src/main/
+src/preload/
+whispo-rs/
+
+# Build artifacts
+out/
+dist/
+build/
+resources/bin/
+
+# Development files
+.vscode/
+.cursor/
+.git/
+.github/
+
+# Documentation (except LICENSE)
+*.md
+!README.md
+IMPLEMENTATION-PLAN.md
+TAURI_MIGRATION.md
+docs/
+
+# Config files
+.editorconfig
+.prettierrc
+.prettierignore
+.npmrc
+.gitignore
+components.json
+tsconfig.*.json
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Scripts
+scripts/
